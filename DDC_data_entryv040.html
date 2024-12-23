@@ -1,0 +1,301 @@
+ <!--we used https://canada.viya4.sasdemo.ca/SASVisualAnalytics/resources/custom_table.html 
+     as the basis for this page --> 
+ <!doctype html> 
+ <html> 
+ THIS IS VERSION v040 
+ <head> 
+ <title>SAS Visual Analytics Custom Data Table</title> 
+ <script type="text/javascript" src="util/messagingUtil.js"></script> 
+   <script type="text/javascript" src="util/jobExecutionUtil.js"></script> 
+   <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script> 
+ <style> 
+     body {font-family: AvenirNext, Helvetica, Arial, sans-serif;  
+           font-size: .8889rem;  
+           background-color: #80b0ef;}  
+     table {border-collapse: collapse;}  
+     th {text-align: left;}  
+     th, td {padding: 0.25rem .5rem;}  
+     tbody, tr + tr {border-top: 1px solid rgb(231, 231, 231);}  
+     th + th, td + td {border-left: 1px solid rgb(231, 231, 231);}  
+     .numeric {text-align: right;}  
+     body::-webkit-scrollbar {width: 0.5em;}  
+     body::-webkit-scrollbar:horizontal {height: 0.5em;}  
+     body::-webkit-scrollbar-thumb {background-color: darkgrey;outline: 1px solid slategrey;}  
+     body::-webkit-scrollbar-button {display: none;}  
+     #sample {display: block;}  
+     .additional-info {width: 100%;padding: 10px;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;font-size: 16px;}  
+     .spinner {display: none;width: 50px;height: 50px;border: 5px solid #f3f3f3;border-top: 5px solid #3498db;border-radius: 50%;animation: spin 1s linear infinite;}  
+     @keyframes spin {0% { transform: rotate(0deg); }25% { transform: rotate(90deg); }50% { transform: rotate(180deg); }75% { transform: rotate(270deg); }100% { transform: rotate(360deg); }}  
+     .message {display: none;margin-top: 20px;font-size: 18px;color: rgb(0, 128, 11);}  
+ </style> 
+ </head> 
+ <body> 
+ <div id="instruction"> 
+ <!-- <p>The data-driven content object enables you to incorporate your own content, like a calendar object, into a SAS Visual Analytics report.</p> --> 
+ </div><div id="sample"></div> 
+ <form id="myForm"> 
+ <script> 
+  
+ var sampleData = {data:[ 
+         ["Canada","North America",6], 
+     ]}; 
+  
+     /* EVENT HANDLERS */ 
+     var self = this; 
+     var sampleColumnInfo = [{label: "Country", type: "string"}, 
+         {label: "Region", type: "string"}, 
+         {label: "Happiness Rank", type: "number"} 
+     ]; 
+  
+     // Retrieve data and begin processing 
+     function onMessage(evt) { 
+         if (evt & evt.data) { 
+             var results = null; 
+             var columnInfo = null; 
+             self.resultName = evt.data.resultName; 
+  
+             if (evt.data.availableRowCount >= 0) { 
+                 results = evt.data; 
+                 columnInfo = evt.data.columns; 
+ 
+                 //Add any input/select columns here start with bi901 
+ evt.data.columns.push({"name":"bi901","label":"Notes","type":"string","class":"additional-info"});                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+ evt.data.columns.push({"name":"bi902","label":"Risk Status","type":"string"});                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+ evt.data.columns.push({"name":"bi903","label":"Preferred Language","type":"string"});                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+ evt.data.columns.push({"name":"bi904","label":"Submission Date","type":"date"});                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+             } 
+             else if (evt.data.availableRowCount == -1) { 
+                 results = sampleData; 
+                 columnInfo = sampleColumnInfo; 
+             } 
+  
+             if(results) { 
+                 jsonToTable(columnInfo, results.data); 
+             } 
+         } 
+     } 
+  
+     if (window.addEventListener) { 
+         // For standards-compliant web browsers 
+         window.addEventListener("message", onMessage, false); 
+     } else { 
+         window.attachEvent("onmessage", onMessage); 
+     } 
+  
+     // Update the objects selection when a row is checked/unchecked 
+     function sendSelection(evt) { 
+         var selectedRows = document.querySelectorAll(':checked'); 
+         var selection = []; 
+         for (var i = 0; i < selectedRows.length; i++) 
+         { 
+             var row = selectedRows[i]; 
+             selection.push({row: row.id}); 
+         } 
+  
+         var message = { 
+             resultName: self.resultName, 
+             selections: selection 
+         }; 
+  
+         sendMessage(message); 
+     } 
+  
+     function sendMessage(message) 
+     { 
+         var url = (window.location != window.parent.location) 
+             ? document.referrer 
+             : document.location.href; 
+  
+         window.parent.postMessage(message, url); 
+     } 
+  
+     /*  TABLE CREATION  */ 
+     // Create an HTML DOM element of the given type containing the given text 
+     function createElementWithText(element, text) { 
+         var e = document.createElement(element); 
+         e.appendChild(document.createTextNode(text)); 
+         return e; 
+     } 
+  
+     // Process the array of CSV data and create a table 
+     function jsonToTable(columnInfo, jsonData) { 
+  
+         // Create table 
+         var tableDivId = 'sample'; // identifier for the tables parent/container 
+         var tableDiv = document.getElementById(tableDivId); 
+  
+         // If a table already exists in our custom div, remove it 
+         tableDiv.innerHTML = ""; 
+  
+         var table = tableDiv.appendChild(document.createElement('table')); 
+         var lastColumnIsSelectionData = false; 
+         // Create headers from column info 
+         addHeaderRow(columnInfo.filter(function (c) { 
+             if (c.usage == "brush") { 
+                 lastColumnIsSelectionData = true; 
+                 return false; 
+             } 
+             return true; 
+         }).map(function (c) { 
+             return c.label; 
+         })); 
+  
+         // Create table body for incoming data 
+         var tableBody = table.appendChild(document.createElement('tbody')); 
+  
+         // Add remaining rows to table body 
+         if (jsonData) { 
+             for (var i = 0; i < jsonData.length; i++) { 
+                 addDataRow(jsonData[i], lastColumnIsSelectionData); 
+             } 
+         } 
+  
+         // Append a header row to the table 
+         function addHeaderRow(columnLabels) { 
+             // Create table row 
+             var tableHead = document.createElement('thead'); 
+             var tr = document.createElement('tr'); 
+  
+             // Add a blank cell for checkbox/selection column 
+             tr.appendChild(document.createElement('th')); 
+  
+             // Add a header cell for each column heading 
+             columnLabels.forEach(function (header) { 
+                 tr.appendChild(createElementWithText('th', header)); 
+             }); 
+             tr.appendChild(document.createElement('th')); 
+  
+             tableHead.appendChild(tr); 
+             table.appendChild(tableHead); 
+         } 
+  
+        // Append a data row to the table 
+        function addDataRow(dataFields, lastColumnIsSelectionData) { 
+            addDataRow.rowNum = ++addDataRow.rowNum || 0; 
+            var tr = document.createElement('tr'); 
+ 
+            // Add a checkbox/selector with ID to each row 
+            var checkbox = document.createElement('input'); 
+            checkbox.type = 'checkbox'; 
+            checkbox.setAttribute('id', addDataRow.rowNum); 
+            checkbox.setAttribute('class', 'row-select'); 
+            checkbox.addEventListener('click', sendSelection); 
+            checkbox.checked = true; 
+            checkbox.hidden = true; 
+ 
+            var checkboxCell = document.createElement('td'); 
+            checkboxCell.appendChild(checkbox); 
+            tr.appendChild(checkboxCell); 
+ 
+            // Add table cell for each data field 
+            dataFields.forEach(function (field, index) { 
+                if (lastColumnIsSelectionData & index == dataFields.length - 1) { 
+                    if (field > 0) 
+                        checkbox.checked = true; 
+                    return; 
+                } 
+                var td = createElementWithText('td', field); 
+                if (!isNaN(field)) { 
+                    td.className = 'numeric'; // Set numeric class to align numeric cells 
+                } 
+                tr.appendChild(td); 
+            }); 
+ 
+        } 
+     } 
+ </script> 
+ <BR><BR> 
+ <button onclick="submitSelections()">Submit Selections</button> 
+ </form> 
+ <br><br> 
+ <div class="spinner" id="spinner"></div> 
+ <div class="message" id="message2">Job is processing</div> 
+  
+ <div class="message" id="message">Data processed successfully!</div> 
+  
+ <script> 
+         function submitSelections() { 
+  
+             const table = document.getElementById('sample'); 
+             const inputs = table.getElementsByTagName('input'); 
+             const nonCheckboxInputs = Array.from(inputs).filter(input => input.type == 'text'); 
+             const notevalues = []; //this is the notes note1 and note2 
+  
+             for (let j of nonCheckboxInputs) { 
+                 notevalues.push(j.value); 
+             } 
+  
+             const selects = table.getElementsByTagName('select'); 
+             const selectedValues = []; //this is the dropdown values 2 and 3 
+  
+             for (let select of selects) { 
+                 selectedValues.push(select.value); 
+             } 
+  
+             const dateInputs = Array.from(inputs).filter(input => input.type == 'date'); 
+             const dateValues = []; // this is the date values 
+  
+             for (let dateInput of dateInputs) { 
+                 dateValues.push(dateInput.value); 
+             } 
+  
+             const selectedRows = []; //this is var1, var2, etc 
+             const checkboxes = document.querySelectorAll('.row-select:checked'); 
+             let i = 0; 
+             checkboxes.forEach(checkbox => { 
+                 const row = checkbox.closest('tr'); 
+                 const radioButtons = row.querySelectorAll('input[type="radio"]'); 
+                         let selectedLanguage = []; 
+                         radioButtons.forEach(radio => { 
+                             if (radio.checked) { 
+                                 selectedLanguage[i] = radio.value; 
+                             } 
+                         }); 
+                 const rowData = { 
+                     Ccompany: row.cells[1].innerText 
+                     , Ntax_year: row.cells[2].innerText 
+                     , Cnotes: String(notevalues[i]) 
+                     , Nstatus: String(selectedValues[i]) 
+                     , Clanguage: String(selectedLanguage[i]) 
+                     , Ddate: dateValues[i]  
+                 }; 
+                 selectedRows.push(rowData); 
+             i++; 
+             }); 
+  
+              const url = "https://canada.viya4.sasdemo.ca" //this is the url of the viya server 
+              const parameters = { 
+              "_program": "/Public/ChrisS/CRA/save_data_from_VA_v3", 
+              } //this is the path and the name of the sas job definition 
+           executeJob(url, selectedRows, parameters).then(response => console.log(response)) 
+     } 
+  
+ document.getElementById('myForm').addEventListener('submit', function(event) { 
+     event.preventDefault(); // Prevent the default form submission 
+  
+ //this section deals with spinner and message after job has been submitted 
+  
+     // Show the spinner 
+     document.getElementById('spinner').style.display = 'block'; 
+     document.getElementById('message2').style.display = 'block'; 
+  
+     // Simulate data processing with a timeout 
+     setTimeout(function() { 
+         // Hide the spinner after processing 
+         document.getElementById('spinner').style.display = 'none'; 
+         // Show the success message 
+         document.getElementById('message').style.display = 'block'; 
+         document.getElementById('message2').style.display = 'none'; 
+  
+         // Hide the success message after 3 seconds 
+         setTimeout(function() { 
+             document.getElementById('message').style.display = 'none'; 
+         }, 4000); // 3 seconds 
+  
+     }, 50000); // Simulate a 50-second processing time 
+  
+     }); 
+  
+ </script> 
+ </body> 
+ </html> 
