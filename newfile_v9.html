@@ -59,10 +59,12 @@ var sampleData = {data:[
                 
                 //Add any input/select columns here start with bi901
                 // the following are examples of text input, drop-down, radio button, and date fields
-                evt.data.columns.push({"name":"bi901","label":"Notes","type":"string","class":"additional-info"});
-                evt.data.columns.push({"name":"bi902","label":"Risk Status","type":"string"});
-                evt.data.columns.push({"name":"bi903","label":"Preferred Language","type":"string"});
-                evt.data.columns.push({"name":"bi904","label":"Submission Date","type":"date"}); 
+                evt.data.columns.push({"name":"bi901","label":"Notes1","type":"string","class":"additional-info"});
+                evt.data.columns.push({"name":"bi902","label":"Notes2","type":"string","class":"additional-info"});
+                evt.data.columns.push({"name":"bi903","label":"Risk Status1","type":"string"});
+                evt.data.columns.push({"name":"bi904","label":"Risk Status2","type":"string"});
+                evt.data.columns.push({"name":"bi905","label":"Preferred Language","type":"string"});
+                evt.data.columns.push({"name":"bi906","label":"Submission Date","type":"date"}); 
             }
             else if (evt.data.availableRowCount == -1) {
                 results = sampleData;
@@ -202,67 +204,89 @@ var sampleData = {data:[
             });
 
             //Add your own input/select elements and text below here
-            var inputbox = document.createElement('input');
-            inputbox.type = 'text';
-            inputbox.setAttribute('id', 'text'+addDataRow.rowNum);
+            var inputbox1 = document.createElement('input');
+            inputbox1.type = 'text';
+            inputbox1.setAttribute('id', 'text1'+addDataRow.rowNum);
 
-            var inputboxCell = document.createElement('td');
-            inputboxCell.appendChild(inputbox);
-            tr.appendChild(inputboxCell);
+            var inputbox1Cell = document.createElement('td');
+            inputbox1Cell.appendChild(inputbox1);
+            tr.appendChild(inputbox1Cell);
 
-            var selectbox = document.createElement('select');
-            selectbox.setAttribute('id', 'select' + addDataRow.rowNum);
+            var inputbox2 = document.createElement('input');
+            inputbox2.type = 'text';
+            inputbox2.setAttribute('id', 'text2'+addDataRow.rowNum);
+
+            var inputbox2Cell = document.createElement('td');
+            inputbox2Cell.appendChild(inputbox2);
+            tr.appendChild(inputbox2Cell);
+            
+            var select3box = document.createElement('select');
+            select3box.setAttribute('id', 'select3' + addDataRow.rowNum);
 
             // code to add options to the selectbox element
-            var options = [' ','1', '2', '3']; //these will be the numeric values passed
-            var optionArray = ['--select--','Low','Med','High']; //these are the options displayed
-            options.forEach(function(optionText, index) {
-            var option = document.createElement('option');
-            option.value = optionText.toLowerCase().replace(' ', '-');
-            option.text = optionArray[index]; //optionText-this was the default;
-            selectbox.appendChild(option);
+            var options3 = [' ','1', '2', '3']; //these will be the numeric values passed
+            var option3Array = ['--select--','Low','Med','High']; //these are the options displayed
+            options3.forEach(function(optionText, index) {
+            var option3 = document.createElement('option');
+            option3.value = optionText.toLowerCase().replace(' ', '-');
+            option3.text = option3Array[index]; //optionText-this was the default;
+            selectbox.appendChild(option3);
             });
 
-            var selectboxCell = document.createElement('td');
-            selectboxCell.appendChild(selectbox);
-            tr.appendChild(selectboxCell);
+            var select4box = document.createElement('select');
+            select4box.setAttribute('id', 'select4' + addDataRow.rowNum);
 
-            // Add radio buttons for language selection
-            var radioCell = document.createElement('td');
-            var radioEnglish = document.createElement('input');
-            radioEnglish.type = 'radio';
-            radioEnglish.name = 'language' + addDataRow.rowNum;
-            radioEnglish.value = 'English';
-            radioEnglish.id = 'english' + addDataRow.rowNum;
+            // code to add options to the selectbox element
+            var options4 = [' ','1', '2', '3']; //these will be the numeric values passed
+            var option4Array = ['--select--','Low','Med','High']; //these are the options displayed
+            options4.forEach(function(optionText, index) {
+            var option4 = document.createElement('option');
+            option4.value = optionText.toLowerCase().replace(' ', '-');
+            option4.text = option4Array[index]; //optionText-this was the default;
+            selectbox.appendChild(option4);
+            });
 
-            var labelEnglish = document.createElement('label');
-            labelEnglish.htmlFor = 'english' + addDataRow.rowNum;
-            labelEnglish.appendChild(document.createTextNode('English'));
 
-            var radioFrench = document.createElement('input');
-            radioFrench.type = 'radio';
-            radioFrench.name = 'language' + addDataRow.rowNum;
-            radioFrench.value = 'French';
-            radioFrench.id = 'french' + addDataRow.rowNum;
+            // var selectboxCell = document.createElement('td');
+            // selectboxCell.appendChild(selectbox);
+            // tr.appendChild(selectboxCell);
 
-            var labelFrench = document.createElement('label');
-            labelFrench.htmlFor = 'french' + addDataRow.rowNum;
-            labelFrench.appendChild(document.createTextNode('French'));
+            // // Add radio buttons for language selection
+            // var radioCell = document.createElement('td');
+            // var radioEnglish = document.createElement('input');
+            // radioEnglish.type = 'radio';
+            // radioEnglish.name = 'language' + addDataRow.rowNum;
+            // radioEnglish.value = 'English';
+            // radioEnglish.id = 'english' + addDataRow.rowNum;
 
-            radioCell.appendChild(radioEnglish);
-            radioCell.appendChild(labelEnglish);
-            radioCell.appendChild(radioFrench);
-            radioCell.appendChild(labelFrench);
-            tr.appendChild(radioCell);
+            // var labelEnglish = document.createElement('label');
+            // labelEnglish.htmlFor = 'english' + addDataRow.rowNum;
+            // labelEnglish.appendChild(document.createTextNode('English'));
 
-            // Add date input element
-            var dateInput = document.createElement('input');
-            dateInput.type = 'date';
-            dateInput.setAttribute('id', 'date' + addDataRow.rowNum);
+            // var radioFrench = document.createElement('input');
+            // radioFrench.type = 'radio';
+            // radioFrench.name = 'language' + addDataRow.rowNum;
+            // radioFrench.value = 'French';
+            // radioFrench.id = 'french' + addDataRow.rowNum;
 
-            var dateInputCell = document.createElement('td');
-            dateInputCell.appendChild(dateInput);
-            tr.appendChild(dateInputCell);
+            // var labelFrench = document.createElement('label');
+            // labelFrench.htmlFor = 'french' + addDataRow.rowNum;
+            // labelFrench.appendChild(document.createTextNode('French'));
+
+            // radioCell.appendChild(radioEnglish);
+            // radioCell.appendChild(labelEnglish);
+            // radioCell.appendChild(radioFrench);
+            // radioCell.appendChild(labelFrench);
+            // tr.appendChild(radioCell);
+
+            // // Add date input element
+            // var dateInput = document.createElement('input');
+            // dateInput.type = 'date';
+            // dateInput.setAttribute('id', 'date' + addDataRow.rowNum);
+
+            // var dateInputCell = document.createElement('td');
+            // dateInputCell.appendChild(dateInput);
+            // tr.appendChild(dateInputCell);
 
             tableBody.appendChild(tr);
         }
