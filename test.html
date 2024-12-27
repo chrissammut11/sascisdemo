@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test extractValues</title>
+</head>
+<body>
+    <table id="testTable">
+        <tr>
+            <td><input type="text" value="Text1"></td>
+            <td><input type="date" value="2023-10-01"></td>
+            <td><select>
+                <option value="Option1" selected>Option1</option>
+                <option value="Option2">Option2</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td><input type="text" value="Text2"></td>
+            <td><input type="date" value="2023-10-02"></td>
+            <td><select>
+                <option value="Option3" selected>Option3</option>
+                <option value="Option4">Option4</option>
+            </select></td>
+        </tr>
+    </table>
+
+    <script>
+        function extractValues(table, tagName, inputType, suffix) {
+            const values = [];
+
+            const inp = table.getElementsByTagName(tagName);
+
+            if (inputType === 'text' || inputType === 'date') {
+                const filteredInputs = Array.from(inp).filter(input => input.type === inputType);
+                for (let input of filteredInputs) {
+                    values.push(input.value);
+                }
+            } else if (inputType === 'select') {
+                for (let select of inp) {
+                    values.push(select.value);
+                }
+            }
+
+            return values;
+        }
+
+        const table = document.getElementById('testTable');
+        const noteValues = extractValues(table, 'input', 'input', 'text');
+        const selectedValues = extractValues(table, 'select', 'select', 'select');
+        const dateValues = extractValues(table, 'input', 'input', 'date');
+
+        console.log('noteValues:', noteValues); // Output: ['Text1', 'Text2']
+        console.log('selectedValues:', selectedValues); // Output: ['Option1', 'Option3']
+        console.log('dateValues:', dateValues); // Output: ['2023-10-01', '2023-10-02']
+    </script>
+</body>
+</html>
