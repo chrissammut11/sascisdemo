@@ -46,8 +46,8 @@ var sampleData = {data:[
         {label: "Happiness Rank", type: "number"}
     ];
 
-    var columnCount = 0;
-    var columnLabels ;
+    var VAcolumnCount = 0;
+    var VAcolumnLabels = [];
 
     // Retrieve data and begin processing
     function onMessage(evt) {
@@ -60,17 +60,6 @@ var sampleData = {data:[
                 results = evt.data;
                 columnInfo = evt.data.columns;
 
-        if (columnInfo) {
-            columnCount = columnInfo.length;
-            for (var i = 0; i < columnInfo.length; i++) {
-                    window['columnLabel' + (i + 1)] = columnInfo[i].label;
-                }
-
-                // Example of accessing the variables
-                console.log("Column label 1: " + columnLabel1);
-                console.log("Column label 2: " + columnLabel2);
-
-      }               
 
                 //Add any input/select columns here start with bi901
                 // the following are examples of text input, drop-down, radio button, and date fields
@@ -85,6 +74,19 @@ var sampleData = {data:[
                 results = sampleData;
                 columnInfo = sampleColumnInfo;
             }
+
+                if (columnInfo) {
+                    VAcolumnCount = columnInfo.length;
+                    for (var i = 0; i < columnInfo.length; i++) {
+                    VAcolumnLabels[i] = columnInfo[i].label;
+                    console.log("Column label " + (i + 1) + ": " + VAcolumnLabels[i]);
+                        }
+
+                        // // Example of accessing the variables
+                        // console.log("Column label 1: " + columnLabel1);
+                        // console.log("Column label 2: " + columnLabel2);
+
+            }               
 
             if(results) {
                 jsonToTable(columnInfo, results.data);
@@ -359,7 +361,7 @@ var sampleData = {data:[
                         });
 
 
-                console.log("Number of columns being processed rowData: " + columnCount);
+                console.log("Number of columns being processed rowData: " + VAcolumnCount);
 
                 let x1 = row.cells[1].innerText;
                 let x2 = row.cells[2].innerText
@@ -368,7 +370,7 @@ var sampleData = {data:[
                 let x5 = String(selectedLanguage[i]);
                 let x6 = dateValues[i] ;
 
-                const rowData = {v1: x1, v2: x2, v3: x3, v4: x4, v5: x5, v6: x6 };
+                const rowData = {columnLabel1: x1, columnLabel2: x2, v3: x3, v4: x4, v5: x5, v6: x6 };
                 console.log("rowData = "+rowData);
                 selectedRows.push(rowData);
             i++;
