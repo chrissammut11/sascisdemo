@@ -381,14 +381,10 @@ var sampleData = {data:[
                     VArowData[label] = row.cells[index + 1].innerText; // Adjust index as needed
                 });
 
-                console.log("VAcol_labels=", VAcol_labels); // Output the VAcol_labels array
                 for (let j = 0; j < TOTcol_labels.length; j++) {
                     TOTrowData[TOTcol_labels[j]] = String(notevalues[j]);
                 }
-                // selectedRows.push(rowData);
-
                 const rowData = Object.assign(TOTrowData, VArowData);  
-                console.log("rowData=", rowData); 
                 selectedRows.push(rowData);
 
             i++;
