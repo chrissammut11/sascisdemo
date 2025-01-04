@@ -43,8 +43,7 @@ var sampleData = {data:[
     var self = this;
 
     let VAcol_labels = []; 
-    let VAcol_names = [];
-    let TOTcol_names = [];
+    let TOTcol_labels = [];
 
     // Retrieve data and begin processing
     function onMessage(evt) {
@@ -58,25 +57,38 @@ var sampleData = {data:[
                 columnInfo = evt.data.columns;
 
                 VAcol_labels = columnInfo.map(column => "VA_"+column.label);
-                VAcol_names = columnInfo.map(column => column.name);
+                console.log("VAcol_labels", VAcol_labels);
 
                 //Add any input/select columns here start with bi901
                 // the following are examples of text input, drop-down, radio button, and date fields
-                evt.data.columns.push({"name":"DE901_CNotes_1","label":"Notes1","type":"string","class":"additional-info"});
-                evt.data.columns.push({"name":"DE902_CNotes_2","label":"Notes2","type":"string","class":"additional-info"});
-                evt.data.columns.push({"name":"DE903_CNotes_3","label":"Notes3","type":"string","class":"additional-info"});
-                evt.data.columns.push({"name":"DE904_NRisk_Status_1","label":"Risk Status1","type":"string"});
-                evt.data.columns.push({"name":"DE905_CRisk_Status_2","label":"Risk Status2","type":"string"});
-                evt.data.columns.push({"name":"DE906_DSubmission_Date","label":"Submission Date","type":"date"}); 
-                evt.data.columns.push({"name":"DE907_CPreferred_Language","label":"Preferred Language","type":"string"});
+                evt.data.columns.push({"name":"ADD901_CNotes_1","label":"Notes1","type":"string","class":"additional-info"});
+                evt.data.columns.push({"name":"ADD902_CNotes_2","label":"Notes2","type":"string","class":"additional-info"});
+                evt.data.columns.push({"name":"ADD903_CNotes_3","label":"Notes3","type":"string","class":"additional-info"});
+                evt.data.columns.push({"name":"ADD904_NRisk_Status_1","label":"Risk Status1","type":"string"});
+                evt.data.columns.push({"name":"ADD905_CRisk_Status_2","label":"Risk Status2","type":"string"});
+                evt.data.columns.push({"name":"ADD906_DSubmission_Date","label":"Submission Date","type":"date"}); 
+                evt.data.columns.push({"name":"ADD907_CPreferred_Language","label":"Preferred Language","type":"string"});
 
                 // Extract substring from name property
-                TOTcol_names = columnInfo.map(column => {
-                    if (column.name.startsWith("DE9")) {
+                TOTcol_labels = columnInfo.map(column => {
+                    if (column.name.startsWith("ADD9")) {
                         return column.name.substring(column.name.indexOf('_') + 1);
                     }
                     return column.name;
                 });
+
+                console.log("Extracted Names", TOTcol_labels);
+
+                let numElementsToReplace = VAcol_labels.length;
+                for (let i = 0; i < numElementsToReplace; i++) {
+                    TOTcol_labels[i] = VAcol_labels[i];
+                }
+
+                console.log("Updated Extracted_Names", TOTcol_labels);
+
+                // TOTcol_labels = columnInfo.map(column => column.label);
+                // const temp = new Set(VAcol_labels);
+                // TOTcol_labels = TOTcol_labels.filter(item => !temp.has(item));
             }
             else if (evt.data.availableRowCount == -1) {
                 results = sampleData;
@@ -326,75 +338,118 @@ var sampleData = {data:[
 
     <script>
         function submitSelections() {
-
             const table = document.getElementById('sample');
-            const inputs = table.getElementsByTagName('input');
-            const nonCheckboxInputs = Array.from(inputs).filter(input => input.type == 'text');
-            var entered_values = []; //this is the notes note1 and note2
-
-            const selects = table.getElementsByTagName('select');
-            var selectedValues = []; //this is the dropdown values 2 and 3
-
-            for (let j of nonCheckboxInputs) {
-                entered_values.push(j.value);
-            }
-
-
-            for (let select of selects) {
-                selectedValues.push(select.value);
-            }
-
-            entered_values = entered_values.concat(selectedValues);
-
-            const dateInputs = Array.from(inputs).filter(input => input.type == 'date');
-            var dateValues = []; // this is the date values
-
-            for (let dateInput of dateInputs) {
-                dateValues.push(dateInput.value);
-            }
-
-            entered_values = entered_values.concat(dateValues);
-
-            const selectedRows = []; //this is var1, var2, etc
+            const selectedRows = []; // this is var1, var2, etc
             const checkboxes = document.querySelectorAll('.row-select:checked');
-            let i = 0;
-            checkboxes.forEach(checkbox => {
-                const row = checkbox.closest('tr');
-                const radioButtons = row.querySelectorAll('input[type="radio"]');
-                        var selectedLanguage = [];
-                        radioButtons.forEach(radio => {
-                            if (radio.checked) {
-                                selectedLanguage[i] = radio.value;
-                            }
-                        });
-                entered_values = entered_values.concat(selectedLanguage);
 
-                const VArowData = {};
-                const TOTrowData = {};
+    let rowData = {};
+    checkboxes.forEach(checkbox => {
+        const row = checkbox.closest('tr');
+        rowData = {}; // Initialize rowData dictionary
 
-                // Dynamically set properties using VAcol_labels
-                VAcol_labels.forEach((label, index) => {
-                    VArowData[label] = row.cells[index + 1].innerText; // Adjust index as needed
-                });
-                let uniqueArray1 = TOTcol_names.filter(element => !VAcol_names.includes(element));
-                console.log("uniqueArray1 for row"+i, uniqueArray1);
+        // Collect the innerHTML of specific cells within the current row
+        const cells = row.getElementsByTagName('td');
+        Array.from(cells).forEach((cell, index) => {
+            rowData[`cell${index + 1}`] = cell.innerHTML;
+        });
 
-                // start j where?
-                for (let j = 0; j < entered_values.length; j++) {
-                    TOTrowData[uniqueArray1[j]] = entered_values[j];
-                }
-                const rowData = Object.assign({}, VArowData, TOTrowData);  
-                selectedRows.push(rowData);
-                console.log("rowData", rowData);
-            i++;
-            });
+        // Collect only the text input boxes within the current row
+        const nonCheckboxInputs = Array.from(row.getElementsByTagName('input')).filter(input => input.type === 'text');
 
-        //       const url = "https://canada.viya4.sasdemo.ca" //this is the url of the viya server
-        //       const parameters = {
-        //       "_program": "/Public/ChrisS/CRA/save_data_from_VA_v4",
-        //       } //this is the path and the name of the sas job definition
-        //    executeJob(url, selectedRows, parameters).then(response => console.log(response))
-    }
+        nonCheckboxInputs.forEach((input, index) => {
+            rowData[`note${index + 1}`] = input.value;
+        });
+
+        // Collect the select tags within the current row
+        const selectTags = row.getElementsByTagName('select');
+        Array.from(selectTags).forEach((select, index) => {
+            rowData[`select${index + 1}`] = select.value;
+        });
+
+        // Collect the date input tags within the current row
+        const dateInputs = Array.from(row.getElementsByTagName('input')).filter(input => input.type === 'date');
+        dateInputs.forEach((input, index) => {
+            rowData[`date${index + 1}`] = input.value;
+        });
+
+        // Collect the radio buttons within the current row
+        const radioButtons = Array.from(row.getElementsByTagName('input')).filter(input => input.type === 'radio' && input.checked);
+        radioButtons.forEach((input, index) => {
+            rowData[`radio${index + 1}`] = input.value;
+        });
+
+        selectedRows.push(rowData);
+    });
+
+    console.log ("the row data is =", rowData);
+    console.log("selected rows is =", selectedRows);
+    // const url = "https://canada.viya4.sasdemo.ca"; // this is the url of the viya server
+    // const parameters = {
+    //     "_program": "/Public/ChrisS/CRA/save_data_from_VA_v4",
+    // }; // this is the path and the name of the sas job definition
+    // executeJob(url, selectedRows, parameters).then(response => console.log(response));
+}
+
+            // const table = document.getElementById('sample');
+            // const inputs = table.getElementsByTagName('input');
+            // const nonCheckboxInputs = Array.from(inputs).filter(input => input.type == 'text');
+            // var entered_values = []; //this is the notes note1 and note2
+
+            // const selects = table.getElementsByTagName('select');
+            // var selectedValues = []; //this is the dropdown values 2 and 3
+
+            // for (let j of nonCheckboxInputs) {
+            //     entered_values.push(j.value);
+            // }
+
+
+            // for (let select of selects) {
+            //     selectedValues.push(select.value);
+            // }
+
+            // entered_values = entered_values.concat(selectedValues);
+
+            // const dateInputs = Array.from(inputs).filter(input => input.type == 'date');
+            // var dateValues = []; // this is the date values
+
+            // for (let dateInput of dateInputs) {
+            //     dateValues.push(dateInput.value);
+            // }
+
+            // entered_values = entered_values.concat(dateValues);
+
+            // const selectedRows = []; //this is var1, var2, etc
+            // const checkboxes = document.querySelectorAll('.row-select:checked');
+            // let i = 0;
+            // checkboxes.forEach(checkbox => {
+            //     const row = checkbox.closest('tr');
+            //     const radioButtons = row.querySelectorAll('input[type="radio"]');
+            //             var selectedLanguage = [];
+            //             radioButtons.forEach(radio => {
+            //                 if (radio.checked) {
+            //                     selectedLanguage[i] = radio.value;
+            //                 }
+            //             });
+            //     entered_values = entered_values.concat(selectedLanguage);
+
+            //     const VArowData = {};
+            //     const TOTrowData = {};
+
+            //     // Dynamically set properties using VAcol_labels
+            //     VAcol_labels.forEach((label, index) => {
+            //         VArowData[label] = row.cells[index + 1].innerText; // Adjust index as needed
+            //     });
+
+            //     for (let j = 0; j < TOTcol_labels.length; j++) {
+            //         TOTrowData[TOTcol_labels[j]] = entered_values[j];
+            //     }
+            //     const rowData = Object.assign({},TOTrowData, VArowData);  
+            //     selectedRows.push(rowData);
+            // i++;
+            // console.log("total row data is =", TOTrowData);
+            // console.log("row data is =", rowData);
+            // });
+
 
 document.getElementById('myForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent the default form submission
