@@ -33,6 +33,8 @@
 </div><div id="sample"></div>
 <form id="myForm">
 <script>
+    var clib = "public";
+
     /* EVENT HANDLERS */
     var self = this;
 
@@ -51,7 +53,7 @@
                 columnInfo = evt.data.columns;
 
                 VAcol_labels = columnInfo.map(column => "VA_"+column.label);
-                console.log("VAcol_labels", VAcol_labels);
+                //console.log("VAcol_labels", VAcol_labels);
 
                 //Add any input/select columns here start with bi901
                 // the following are examples of text input, drop-down, radio button, and date fields
@@ -366,7 +368,7 @@ function submitSelections() {
 
     const url = "https://canada.viya4.sasdemo.ca"; // this is the url of the viya server
     const parameters = {
-        "_program": "/Public/ChrisS/CRA/save_data_from_VA_v4",
+        "_program": "/Public/ChrisS/CRA/save_data_from_VA_v5&clib=" + clib
     }; // this is the path and the name of the sas job definition
     executeJob(url, selectedRows, parameters).then(response => console.log(response));
 }
@@ -393,7 +395,7 @@ document.getElementById('myForm').addEventListener('submit', function(event) {
             document.getElementById('message').style.display = 'none';
         }, 4000); // 3 seconds
 
-        }, 50000); // Simulate a 50-second processing time
+        }, 25000); // Simulate a 25-second processing time
     });
 </script>
 </body>
