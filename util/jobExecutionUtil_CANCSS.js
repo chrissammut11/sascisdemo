@@ -50,8 +50,6 @@ const executeJob = async (url, data, parameters) => {
     // Add extra url parameters
     parameters = {
         ...parameters,
-        "clib": "PUBLIC",
-        "sourcedsn": "CANCSS_TAX_REVIEW",
         "_action": "background",
         "_output_type": "json"
     }
