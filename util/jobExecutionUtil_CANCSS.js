@@ -51,9 +51,9 @@ const executeJob = async (url, data, parameters) => {
     parameters = {
         ...parameters,
         "clib": "PUBLIC",
-        "sourcedsn": "CANCSS_TAX_REVIEW"
-        // "_action": "background",
-        // "_output_type": "json"
+        "sourcedsn": "CANCSS_TAX_REVIEW",
+        "_action": "background",
+        "_output_type": "json"
     }
     // Convert the parameters to URLSearchParams
     const urlParameters = new URLSearchParams(parameters)
