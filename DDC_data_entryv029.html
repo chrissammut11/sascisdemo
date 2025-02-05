@@ -94,7 +94,6 @@
  
     // Update the object's selection when a row is checked/unchecked 
     function sendSelection(evt) { 
-        //var selectedRows = document.querySelectorAll(':checked'); 
         var selectedRows = document.querySelectorAll('.row-select:checked');
 
         var selection = []; 
@@ -333,10 +332,11 @@ function submitSelections() {
 
     const url = "https://canada.viya4.sasdemo.ca";
     const parameters = {
-        "_program": "/Public/ChrisS/GitHub_DDC/save_data_from_VA_v5",
-        "clib": "PUBLIC",
-        "sourcedsn": "CANCSS_TAX_REVIEW",
-        "historydsn": "CANCSS_TAXREV_HISTORYV5"
+        "_program": "/Public/ChrisS/GitHub_DDC/save_data_from_VA_v5"
+        // adding sas-specific parameters below (these are optional) 
+        , "clib": "PUBLIC"
+        , "sourcedsn": "CANCSS_TAX_REVIEW"
+        , "historydsn": "CANCSS_TAXREV_HISTORYV5"
     };
 
     executeJob(url, selectedRows, parameters).then(response => {
